@@ -46,18 +46,18 @@ namespace SarachanCollectionClassLibrary
         /// 删除 Collection 中所有指定的 item
         /// </summary>
         /// <param name="item">要删除的 item</param>
-        /// <param name="enableReferanceEquals">使用 <seealso cref="Object.ReferenceEquals(object?, object?)"/> 方法来确定 item 是否删除，默认为 false (使用运算符 == 判断)</param>
+        /// <param name="enableReferenceEquals">使用 <seealso cref="Object.ReferenceEquals(object?, object?)"/> 方法来确定 item 是否删除，默认为 false (使用运算符 == 判断)</param>
         /// <returns>如果 Collection 中不存在 item，则会返回 false；否则返回 true</returns>
-        bool Remove(T item, bool enableReferanceEquals = false);
-        // TODO: 关于 Remove 的 enableReferanceEquals 参数可能会出现比较异常的情况，详见 https://docs.microsoft.com/zh-cn/dotnet/api/system.object.referenceequals?view=netcore-3.1#--
+        bool Remove(T item, bool enableReferenceEquals = false);
+        // TODO: 关于 Remove 的 enableReferenceEquals 参数可能会出现比较异常的情况，详见 https://docs.microsoft.com/zh-cn/dotnet/api/system.object.referenceequals?view=netcore-3.1#--
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="item">指定的 item</param>
-        /// <param name="enableReferanceEquals">使用 <seealso cref="Object.ReferenceEquals(object?, object?)"/> 方法来确定 item 是否存在，默认为 false (使用运算符 == 判断)</param>
+        /// <param name="enableReferenceEquals">使用 <seealso cref="Object.ReferenceEquals(object?, object?)"/> 方法来确定 item 是否存在，默认为 false (使用运算符 == 判断)</param>
         /// <returns>Collection 中是否含有指定 item</returns>
-        bool Contains(T item, bool enableReferanceEquals = false);
+        bool Contains(T item, bool enableReferenceEquals = false);
 
         /// <summary>
         /// 将 Collection 中的 item 全部移除

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace SarachanCollectionClassLibrary
 {
@@ -31,6 +32,7 @@ namespace SarachanCollectionClassLibrary
 
             // 采用反射机制构造
             var result = (IList_SCCL<T>)Activator.CreateInstance(arr.GetType()); // 这里选择使用默认无参构造函数而没有选择接收 IEnumerable 的构造函数（防止构造函数不存在
+            Debug.Assert(result != null, nameof(result) + " != null");
             result.Add(arr);
             result.Add(collection);
 
@@ -39,14 +41,17 @@ namespace SarachanCollectionClassLibrary
         #endregion
 
         #region Static Methods
+
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="list"></param>
         /// <param name="index"></param>
-        /// <returns>所给的 index 是否合法</returns>
-        static bool IsIndexLegal(IList_SCCL<T> list, int index)
+        /// <param name="lengthCompensation">list 的补偿大小。一般在插入时确认 index 是否合法使用，默认为 0。</param>
+        /// <returns>在所给的 list 中所给的 index 是否合法</returns>
+        static bool IsIndexLegal(IList_SCCL<T> list, int index, int lengthCompensation = 0)
         {
-            return index >= 0 && index < list.Count;
+            return index >= 0 && index < list.Count + lengthCompensation;
         }
 
         /// <summary>
@@ -66,6 +71,7 @@ namespace SarachanCollectionClassLibrary
         /// <param name="list"></param>
         /// <param name="beginIndex"></param>
         /// <param name="endIndex"></param>
+        /// <param name="comparer">比较器</param>
         /// <param name="reverse">是否是逆序</param>
         static void Sort(IList_SCCL<T> list, int beginIndex, int endIndex, System.Collections.Generic.IComparer<T> comparer = null, bool reverse = false)
         {
@@ -131,9 +137,9 @@ namespace SarachanCollectionClassLibrary
         /// 
         /// </summary>
         /// <param name="item"></param>
-        /// <param name="enableReferanceEquals">使用 <seealso cref="Object.ReferenceEquals(object?, object?)"/> 方法来确定 item 是否删除，默认为 false (使用运算符 == 判断)</param>
+        /// <param name="enableReferenceEquals">使用 <seealso cref="Object.ReferenceEquals(object?, object?)"/> 方法来确定 item 是否删除，默认为 false (使用运算符 == 判断)</param>
         /// <returns>指定 item 的 index，如果不存在则返回 -1</returns>
-        int IndexOf(T item, bool enableReferanceEquals = false);
+        int IndexOf(T item, bool enableReferenceEquals = false);
 
         /// <summary>
         /// 在指定 index 处插入指定 item
@@ -154,6 +160,8 @@ namespace SarachanCollectionClassLibrary
         /// </summary>
         /// <param name="index"></param>
         void RemoveAt(int index);
+
+        string ToString();
         #endregion
     }
 }

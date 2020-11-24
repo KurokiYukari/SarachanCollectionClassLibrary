@@ -4,10 +4,11 @@ using System.Collections.Generic;
 
 namespace SarachanCollectionClassLibrary
 {
-    class ArrayList_SCCL<T> : IList_SCCL<T>
+    public class ArrayList_SCCL<T> : IList_SCCL<T>
     {
         #region Field
-        private static readonly int _DEFAULT_CAPACITY = 4; // ArrayList 的默认 Capacity
+
+        private const int _DEFAULT_CAPACITY = 4; // ArrayList 的默认 Capacity
 
         private T[] _itemArray; // 存储 item 的数组
         #endregion
@@ -43,7 +44,7 @@ namespace SarachanCollectionClassLibrary
             }
         }
 
-        public int Count { get; protected set; } = 0;
+        public int Count { get; protected set; }
 
         public T[] ItemArray
         {
@@ -130,7 +131,7 @@ namespace SarachanCollectionClassLibrary
 
                 if (step == 0)
                 {
-                    return new T[1] { _itemArray[beginIndex] };
+                    return new[] { _itemArray[beginIndex] };
                 }
 
                 var result_ArrayList = new ArrayList_SCCL<T>();
@@ -199,27 +200,27 @@ namespace SarachanCollectionClassLibrary
             Count = 0;
         }
 
-        public bool Contains(T item, bool enableReferanceEquals = false)
+        public bool Contains(T item, bool enableReferenceEquals = false)
         {
-            return IndexOf(item, enableReferanceEquals) != -1;
+            return IndexOf(item, enableReferenceEquals) != -1;
         }
 
-        public int IndexOf(T item, bool enableReferanceEquals = false)
+        public int IndexOf(T item, bool enableReferenceEquals = false)
         {
             for (int i = 0; i < Count; i++)
             {
                 var element = this[i];
 
-                if (enableReferanceEquals)
+                if (enableReferenceEquals)
                 {
-                    if (Object.ReferenceEquals(element, item))
+                    if (ReferenceEquals(element, item))
                     {
                         return i;
                     }
                 }
                 else
                 {
-                    if (Object.Equals(element, item))
+                    if (Equals(element, item))
                     {
                         return i;
                     }
@@ -231,6 +232,11 @@ namespace SarachanCollectionClassLibrary
 
         public void Insert(T item, int index)
         {
+            if (!IList_SCCL<T>.IsIndexLegal(this, index, 1))
+            {
+                throw new IndexOutOfRangeException($"Index: {index} out of range. Item Count: {Count}.");
+            }
+
             CheckCapacity();
 
             for (int i = Count - 1; i >= index; i--)
@@ -244,33 +250,38 @@ namespace SarachanCollectionClassLibrary
 
         public void Insert(IEnumerable<T> collection, int index)
         {
-            int itemCount = 0;
-            var enumerator = collection.GetEnumerator();
-            while (enumerator.MoveNext())
+            if (!IList_SCCL<T>.IsIndexLegal(this, index, 1))
             {
-                itemCount++;
+                throw new IndexOutOfRangeException($"Index: {index} out of range. Item Count: {Count}.");
             }
 
-            CheckCapacity(itemCount);
+            if (collection == null)
+            {
+                return;
+            }
+
+            var itemList = new ArrayList_SCCL<T>(collection);
+
+            CheckCapacity(itemList.Count);
 
             for (int i = Count -1; i >= index; i--)
             {
-                _itemArray[i + itemCount] = _itemArray[i];
+                _itemArray[i + itemList.Count] = _itemArray[i];
             }
 
             int itemIndex = index;
-            foreach (var item in collection)
+            foreach (var item in itemList)
             {
                 _itemArray[itemIndex] = item;
                 itemIndex++;
             }
 
-            Count += itemCount;
+            Count += itemList.Count;
         }
 
-        public bool Remove(T item, bool enableReferanceEquals = false)
+        public bool Remove(T item, bool enableReferenceEquals = false)
         {
-            int itemIndex = IndexOf(item, enableReferanceEquals);
+            int itemIndex = IndexOf(item, enableReferenceEquals);
             if (itemIndex < 0)
             {
                 return false;
@@ -283,6 +294,11 @@ namespace SarachanCollectionClassLibrary
 
         public void RemoveAt(int index)
         {
+            if (!IList_SCCL<T>.IsIndexLegal(this, index))
+            {
+                throw new IndexOutOfRangeException($"Index: {index} out of range. Item Count: {Count}.");
+            }
+
             for (int i = index; i < Count - 1; i++)
             {
                 _itemArray[i] = _itemArray[i + 1];
@@ -295,7 +311,7 @@ namespace SarachanCollectionClassLibrary
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public override string ToString() => "[ " + String.Join(", ", this) + " ]";
+        public override string ToString() => "[ " + string.Join(", ", this) + " ]";
 
         /// <summary>
         /// 检测在增加 increment 数目个 item 后当前 Capacity 是否足够使用。若否，会将 Capacity 扩大到原来的两倍
@@ -307,15 +323,8 @@ namespace SarachanCollectionClassLibrary
 
             if (Capacity == 0)
             {
-                if (neededCapacity < 4)
-                {
-                    _itemArray = new T[_DEFAULT_CAPACITY];
-                }
-                else
-                {
-                    _itemArray = new T[(int)Math.Ceiling(1.2 * neededCapacity)];
-                }
-                
+                _itemArray = neededCapacity < 4 ? new T[_DEFAULT_CAPACITY] : new T[(int)Math.Ceiling(1.2 * neededCapacity)];
+
                 return;
             }
 
@@ -336,19 +345,19 @@ namespace SarachanCollectionClassLibrary
         public sealed class Enumerator : IEnumerator<T>
         {
             private readonly ArrayList_SCCL<T> _arrayList;
-            private ArrayList_SCCL<T> _local_arrayList;
+            private ArrayList_SCCL<T> _local_ArrayList;
             private int _currentIndex;
 
             public T Current
             {
                 get
                 {
-                    if (_currentIndex == -1 || _currentIndex == _local_arrayList.Count)
+                    if (_currentIndex == -1 || _currentIndex == _local_ArrayList.Count)
                     {
                         return default;
                     }
 
-                    return _local_arrayList[_currentIndex];
+                    return _local_ArrayList[_currentIndex];
                 }
             }
 
@@ -367,7 +376,7 @@ namespace SarachanCollectionClassLibrary
 
             public bool MoveNext()
             {
-                if (_currentIndex == _local_arrayList.Count - 1)
+                if (_currentIndex >= _local_ArrayList.Count - 1)
                 {
                     return false;
                 }
@@ -378,7 +387,7 @@ namespace SarachanCollectionClassLibrary
 
             public void Reset()
             {
-                _local_arrayList = (ArrayList_SCCL<T>)_arrayList.MemberwiseClone();
+                _local_ArrayList = (ArrayList_SCCL<T>)_arrayList.MemberwiseClone();
                 _currentIndex = -1;
             }
         }
