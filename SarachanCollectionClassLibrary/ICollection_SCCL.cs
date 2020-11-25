@@ -3,9 +3,9 @@
 namespace SarachanCollectionClassLibrary
 {
     /// <summary>
-    /// 所有 Collection 类都要实现的最基本接口，定义了 Collection 应有的基本功能。
+    /// 所有 Collection 类都要实现的最基本接口，定义了 Collection 要实现的基本功能。
     /// </summary>
-    /// <typeparam name="T">Collection 存储的类型</typeparam>
+    /// <typeparam name="T"></typeparam>
     public interface ICollection_SCCL<T> : System.Collections.Generic.IEnumerable<T>
     {
         #region Properties

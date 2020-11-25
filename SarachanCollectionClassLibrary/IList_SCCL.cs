@@ -3,6 +3,11 @@ using System.Diagnostics;
 
 namespace SarachanCollectionClassLibrary
 {
+    /// <summary>
+    /// 所有 List 结构的接口，定义了 List 要实现的基本功能。
+    /// 对于所有通用的 List 功能（算法等），写作了该接口的 static method。
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     interface IList_SCCL<T> : ICollection_SCCL<T>
     {
         #region Indexers
@@ -32,9 +37,9 @@ namespace SarachanCollectionClassLibrary
 
             // 采用反射机制构造
             var result = (IList_SCCL<T>)Activator.CreateInstance(arr.GetType()); // 这里选择使用默认无参构造函数而没有选择接收 IEnumerable 的构造函数（防止构造函数不存在
-            Debug.Assert(result != null, nameof(result) + " != null");
-            result.Add(arr);
-            result.Add(collection);
+            //Debug.Assert(result != null, nameof(result) + " != null");
+            result!.Add(arr);
+            result!.Add(collection);
 
             return result;
         }

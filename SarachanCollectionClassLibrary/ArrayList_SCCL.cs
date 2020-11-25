@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 namespace SarachanCollectionClassLibrary
 {
+    /// <summary>
+    /// 可变长数组 ArrayList 的实现。
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class ArrayList_SCCL<T> : IList_SCCL<T>
     {
         #region Field
@@ -314,7 +318,7 @@ namespace SarachanCollectionClassLibrary
         public override string ToString() => "[ " + string.Join(", ", this) + " ]";
 
         /// <summary>
-        /// 检测在增加 increment 数目个 item 后当前 Capacity 是否足够使用。若否，会将 Capacity 扩大到原来的两倍
+        /// 检测在增加 increment 数目个 item 后当前 Capacity 是否足够使用。若否，会进行扩容
         /// </summary>
         /// <param name="increment">要增加到 ArrayList 中的 item 的数目</param>
         private void CheckCapacity(int increment = 1)

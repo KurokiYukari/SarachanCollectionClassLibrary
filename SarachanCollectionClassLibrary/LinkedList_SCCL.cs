@@ -4,47 +4,47 @@ using System.Collections.Generic;
 
 namespace SarachanCollectionClassLibrary
 {
+    /// <summary>
+    /// 双向链表 LinkedList 的实现。
+    /// 该类采用了数组缓存来加强随机存取的效率，但这也导致了另外一些操作的效率降低。
+    /// 本质上是一种 双向链表 和 数组 结合的容器类。
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class LinkedList_SCCL<T> : IList_SCCL<T>
     {
-        private readonly LinkedListNode _headNode;
-        private readonly LinkedListNode _endNode;
+        #region Fields
+        // 头尾节点都是辅助节点，不存储实际数据
+        private readonly Node _headNode; // 头节点
+        private readonly Node _endNode; // 尾节点
 
+        // 数组缓存。对 LinkedList 的增、删操作都会导致缓存失效（置为空）。
+        // 该 field 应该只能通过 property NodeListCache 的 get 获取，不应被直接使用。
+        private Node[] _nodeListCache = null; 
+        #endregion
+
+        #region Constructors
+        /// <summary>
+        /// 默认构造函数，构造一个空 LinkedList
+        /// </summary>
         public LinkedList_SCCL()
         {
-            _headNode = new LinkedListNode(default, null, null);
-            _endNode = new LinkedListNode(default, _headNode, null);
+            _headNode = new Node(default, null, null);
+            _endNode = new Node(default, _headNode, null);
             _headNode.NextNode = _endNode;
         }
 
+        /// <summary>
+        /// 构造一个 LinkedList，并将指定 collection 中的所有元素拷贝到该 LinkedList 中
+        /// </summary>
+        /// <param name="collection"></param>
         public LinkedList_SCCL(IEnumerable<T> collection) : this()
         {
             Add(collection);
         }
+        #endregion
 
-        private LinkedListNode[] _nodeListCache = null;
-
-        private LinkedListNode[] NodeListCache
-        {
-            get
-            {
-                if (_nodeListCache != null)
-                {
-                    return _nodeListCache;
-                }
-
-                _nodeListCache = new LinkedListNode[Count];
-                var node = _headNode;
-                for (int i = 0; i < Count; i++)
-                {
-                    node = node.NextNode;
-                    _nodeListCache[i] = node;
-                }
-
-                return _nodeListCache;
-            }
-        }
-
-        public T this[int index] 
+        #region Indexers
+        public T this[int index]
         {
             get
             {
@@ -116,7 +116,9 @@ namespace SarachanCollectionClassLibrary
         }
 
         T ICollection_SCCL<T>.this[int index] => this[index];
+        #endregion
 
+        #region Properties
         public int Count { get; protected set; }
 
         public T[] ItemArray
@@ -133,9 +135,35 @@ namespace SarachanCollectionClassLibrary
             }
         }
 
+        /// <summary>
+        /// 该 LinkedList 中所有 Node 组成的数组
+        /// </summary>
+        protected Node[] NodeListCache
+        {
+            get
+            {
+                if (_nodeListCache != null)
+                {
+                    return _nodeListCache;
+                }
+
+                _nodeListCache = new Node[Count];
+                var node = _headNode;
+                for (int i = 0; i < Count; i++)
+                {
+                    node = node.NextNode;
+                    _nodeListCache[i] = node;
+                }
+
+                return _nodeListCache;
+            }
+        }
+        #endregion
+
+        #region Methods
         public void Add(T item)
         {
-            var node = new LinkedListNode(item, _endNode.PreNode, _endNode);
+            var node = new Node(item, _endNode.PreNode, _endNode);
             node.PreNode.NextNode = node;
             node.NextNode.PreNode = node;
             Count++;
@@ -201,13 +229,13 @@ namespace SarachanCollectionClassLibrary
                 throw new IndexOutOfRangeException($"Index: {index} out of range. Item Count: {Count}.");
             }
 
-            if (Count == 0)
+            if (Count == 0 || Count == index)
             {
                 Add(item);
                 return;
             }
 
-            var node = new LinkedListNode(item, NodeListCache[index].PreNode, NodeListCache[index]);
+            var node = new Node(item, NodeListCache[index].PreNode, NodeListCache[index]);
             node.PreNode.NextNode = node;
             node.NextNode.PreNode = node;
             Count++;
@@ -227,26 +255,26 @@ namespace SarachanCollectionClassLibrary
                 return;
             }
 
-            if (Count == 0)
+            if (Count == 0 || Count == index)
             {
                 Add(collection);
                 return;
             }
 
             int colCount = 0;
-            var fakeHeadNode = new LinkedListNode(default, null, null);
+            var fakeHeadNode = new Node(default, null, null);
             var tailNode = fakeHeadNode;
             foreach (var item in collection)
             {
                 colCount++;
 
-                var newNode = new LinkedListNode(item, tailNode, null);
+                var newNode = new Node(item, tailNode, null);
                 tailNode.NextNode = newNode;
                 tailNode = tailNode.NextNode;
             }
 
             fakeHeadNode.NextNode.PreNode = NodeListCache[index].PreNode;
-            NodeListCache[index].PreNode.NextNode = fakeHeadNode.NextNode.PreNode;
+            NodeListCache[index].PreNode.NextNode = fakeHeadNode.NextNode;
             tailNode.NextNode = NodeListCache[index];
             NodeListCache[index].PreNode = tailNode;
             Count += colCount;
@@ -256,7 +284,15 @@ namespace SarachanCollectionClassLibrary
 
         public bool Remove(T item, bool enableReferenceEquals = false)
         {
-            throw new NotImplementedException();
+            int index = IndexOf(item, enableReferenceEquals);
+
+            if (index == -1)
+            {
+                return false;
+            }
+
+            RemoveAt(index);
+            return true;
         }
 
         public void RemoveAt(int index)
@@ -276,14 +312,18 @@ namespace SarachanCollectionClassLibrary
         IEnumerator IEnumerable.GetEnumerator() => new Enumerator(this);
 
         public override string ToString() => "[ " + string.Join(", ", this) + " ]";
+        #endregion
 
-        private class LinkedListNode
+        /// <summary>
+        /// 链表的节点类型
+        /// </summary>
+        protected class Node
         {
             public T Val { get; set; }
-            public LinkedListNode NextNode { get; set; }
-            public LinkedListNode PreNode { get; set; }
+            public Node NextNode { get; set; }
+            public Node PreNode { get; set; }
 
-            public LinkedListNode(T val, LinkedListNode preNode, LinkedListNode nextNode)
+            public Node(T val, Node preNode, Node nextNode)
             {
                 Val = val;
                 PreNode = preNode;
@@ -295,7 +335,7 @@ namespace SarachanCollectionClassLibrary
         {
             private readonly LinkedList_SCCL<T> _linkedListSccl;
             private LinkedList_SCCL<T> _local_LinkedListSccl;
-            private LinkedListNode _currentNode;
+            private Node _currentNode;
 
             internal Enumerator(LinkedList_SCCL<T> linkedListSccl)
             {
