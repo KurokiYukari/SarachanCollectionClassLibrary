@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace SarachanCollectionClassLibrary
+namespace Sarachan.Collections
 {
     /// <summary>
     /// 双向链表 LinkedList 的实现。
@@ -10,12 +10,12 @@ namespace SarachanCollectionClassLibrary
     /// 本质上是一种 双向链表 和 数组 结合的容器类。
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class LinkedList_SCCL<T> : IList_SCCL<T>
+    public class LinkedList_SCCL<T> : IList_SCCL<T>, IStack_SCCL<T>, IQueue_SCCL<T>
     {
         #region Fields
         // 头尾节点都是辅助节点，不存储实际数据
-        private readonly Node _headNode; // 头节点
-        private readonly Node _endNode; // 尾节点
+        protected readonly Node _headNode; // 头节点
+        protected readonly Node _endNode; // 尾节点
 
         // 数组缓存。对 LinkedList 的增、删操作都会导致缓存失效（置为空）。
         // 该 field 应该只能通过 property NodeListCache 的 get 获取，不应被直接使用。
@@ -48,7 +48,7 @@ namespace SarachanCollectionClassLibrary
         {
             get
             {
-                if (!IList_SCCL<T>.IsIndexLegal(this, index))
+                if (!this.IsIndexLegal(index))
                 {
                     throw new IndexOutOfRangeException($"Index: {index} out of range. Item Count: {Count}.");
                 }
@@ -57,7 +57,7 @@ namespace SarachanCollectionClassLibrary
             }
             set
             {
-                if (!IList_SCCL<T>.IsIndexLegal(this, index))
+                if (!this.IsIndexLegal(index))
                 {
                     throw new IndexOutOfRangeException($"Index: {index} out of range. Item Count: {Count}.");
                 }
@@ -70,11 +70,11 @@ namespace SarachanCollectionClassLibrary
         {
             get
             {
-                if (!IList_SCCL<T>.IsIndexLegal(this, beginIndex))
+                if (!this.IsIndexLegal(beginIndex))
                 {
                     throw new IndexOutOfRangeException($"Param beginIndex: {beginIndex} out of range. Item Count: {Count}.");
                 }
-                if (!IList_SCCL<T>.IsIndexLegal(this, endIndex))
+                if (!this.IsIndexLegal(endIndex))
                 {
                     throw new IndexOutOfRangeException($"Param endIndex: {endIndex} out of range. Item Count: {Count}.");
                 }
@@ -114,8 +114,6 @@ namespace SarachanCollectionClassLibrary
                 return result_ArrayList.ItemArray;
             }
         }
-
-        T ICollection_SCCL<T>.this[int index] => this[index];
         #endregion
 
         #region Properties
@@ -160,6 +158,16 @@ namespace SarachanCollectionClassLibrary
         }
         #endregion
 
+        #region operator
+        public static LinkedList_SCCL<T> operator +(LinkedList_SCCL<T> list, IEnumerable<T> collection)
+        {
+            var result = (LinkedList_SCCL<T>)list?.MemberwiseClone() ?? new LinkedList_SCCL<T>();
+            result.Add(collection);
+
+            return result;
+        }
+        #endregion
+
         #region Methods
         public void Add(T item)
         {
@@ -167,12 +175,12 @@ namespace SarachanCollectionClassLibrary
             node.PreNode.NextNode = node;
             node.NextNode.PreNode = node;
             Count++;
-
-            _nodeListCache = null;
+            ClearNodeCache();
         }
 
         public void Add(IEnumerable<T> collection)
         {
+            collection ??= Array.Empty<T>();
             foreach (var item in collection)
             {
                 Add(item);
@@ -185,7 +193,7 @@ namespace SarachanCollectionClassLibrary
             _headNode.NextNode = _endNode;
             _endNode.PreNode = _headNode;
 
-            _nodeListCache = null;
+            ClearNodeCache();
         }
 
         public bool Contains(T item, bool enableReferenceEquals = false)
@@ -194,6 +202,8 @@ namespace SarachanCollectionClassLibrary
         }
 
         public IEnumerator<T> GetEnumerator() => new Enumerator(this);
+
+        public bool IsEmpty() => Count == 0;
 
         public int IndexOf(T item, bool enableReferenceEquals = false)
         {
@@ -224,7 +234,7 @@ namespace SarachanCollectionClassLibrary
 
         public void Insert(T item, int index)
         {
-            if (!IList_SCCL<T>.IsIndexLegal(this, index, 1))
+            if (!this.IsIndexLegal(index, 1))
             {
                 throw new IndexOutOfRangeException($"Index: {index} out of range. Item Count: {Count}.");
             }
@@ -240,12 +250,12 @@ namespace SarachanCollectionClassLibrary
             node.NextNode.PreNode = node;
             Count++;
 
-            _nodeListCache = null;
+            ClearNodeCache();
         }
 
         public void Insert(IEnumerable<T> collection, int index)
         {
-            if (!IList_SCCL<T>.IsIndexLegal(this, index, 1))
+            if (!this.IsIndexLegal(index, 1))
             {
                 throw new IndexOutOfRangeException($"Index: {index} out of range. Item Count: {Count}.");
             }
@@ -279,7 +289,7 @@ namespace SarachanCollectionClassLibrary
             NodeListCache[index].PreNode = tailNode;
             Count += colCount;
 
-            _nodeListCache = null;
+            ClearNodeCache();
         }
 
         public bool Remove(T item, bool enableReferenceEquals = false)
@@ -297,7 +307,7 @@ namespace SarachanCollectionClassLibrary
 
         public void RemoveAt(int index)
         {
-            if (!IList_SCCL<T>.IsIndexLegal(this, index))
+            if (!this.IsIndexLegal(index))
             {
                 throw new IndexOutOfRangeException($"Index: {index} out of range. Item Count: {Count}.");
             }
@@ -306,12 +316,73 @@ namespace SarachanCollectionClassLibrary
             NodeListCache[index].NextNode.PreNode = NodeListCache[index].PreNode;
             Count--;
 
-            _nodeListCache = null;
+            ClearNodeCache();
         }
+
+        public void PushFront(T item)
+        {
+            var node = new Node(item, _headNode, _headNode.NextNode);
+            _headNode.NextNode = node;
+            node.NextNode.PreNode = node;
+
+            Count++;
+            ClearNodeCache();
+        }
+
+        public void PushBack(T item) => Add(item);
+
+        public T PopFront()
+        {
+            if (IsEmpty())
+            {
+                throw new InvalidOperationException("DeQueue() can't be called while Queue is empty.");
+            }
+
+            var node = _headNode.NextNode;
+            _headNode.NextNode = node.NextNode;
+            node.NextNode.PreNode = _headNode;
+
+            Count--;
+            ClearNodeCache();
+
+            return node.Val;
+        }
+
+        public T PopBack()
+        {
+            if (IsEmpty())
+            {
+                throw new InvalidOperationException("DeQueue() can't be called while Queue is empty.");
+            }
+
+            var node = _endNode.PreNode;
+            _endNode.PreNode = node.PreNode;
+            node.NextNode = _endNode;
+
+            Count--;
+            // 这里可以不需要 ClearNodeCache()
+            // 因为与 Cache 有关的操作都是通过 index 进行的，而 Count 保证了 index 不会越界
+
+            return node.Val;
+        }
+
+        public T PeekFront() =>
+            IsEmpty() ? throw new InvalidOperationException("DeQueue() can't be called while Queue is empty.") : _headNode.NextNode.Val;
+
+        public T PeekBack() =>
+            IsEmpty() ? throw new InvalidOperationException("DeQueue() can't be called while Queue is empty.") : _endNode.PreNode.Val;
 
         IEnumerator IEnumerable.GetEnumerator() => new Enumerator(this);
 
         public override string ToString() => "[ " + string.Join(", ", this) + " ]";
+
+        /// <summary>
+        /// 应该在每次有增、删操作时调用，清除当前的 NodeList 缓存
+        /// </summary>
+        protected void ClearNodeCache()
+        {
+            _nodeListCache = null;
+        }
         #endregion
 
         /// <summary>

@@ -1,9 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <StartupObject>SarachanCollectionClassLibrary.MainClass</StartupObject>
+    <StartupObject>Sarachan.MainClass</StartupObject>
+    <RootNamespace>Sarachan.CollectionClassLibrary</RootNamespace>
+    <AssemblyName>Sarachan.CollectionClassLibrary</AssemblyName>
   </PropertyGroup>
 
 </Project>

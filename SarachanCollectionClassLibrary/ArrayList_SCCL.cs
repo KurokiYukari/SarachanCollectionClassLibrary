@@ -2,16 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace SarachanCollectionClassLibrary
+namespace Sarachan.Collections
 {
     /// <summary>
     /// 可变长数组 ArrayList 的实现。
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ArrayList_SCCL<T> : IList_SCCL<T>
+    public class ArrayList_SCCL<T> : IList_SCCL<T>, IStack_SCCL<T>, IQueue_SCCL<T>
     {
         #region Field
-
         private const int _DEFAULT_CAPACITY = 4; // ArrayList 的默认 Capacity
 
         private T[] _itemArray; // 存储 item 的数组
@@ -101,7 +100,7 @@ namespace SarachanCollectionClassLibrary
         { 
             get
             {
-                if (!IList_SCCL<T>.IsIndexLegal(this, index))
+                if (!this.IsIndexLegal(index))
                 {
                     throw new IndexOutOfRangeException($"Index: {index} out of range. Item Count: {Count}.");
                 }
@@ -111,7 +110,7 @@ namespace SarachanCollectionClassLibrary
 
             set
             {
-                if (!IList_SCCL<T>.IsIndexLegal(this, index))
+                if (!this.IsIndexLegal(index))
                 {
                     throw new IndexOutOfRangeException($"Index: {index} out of range. Item Count: {Count}.");
                 }
@@ -124,11 +123,11 @@ namespace SarachanCollectionClassLibrary
         {
             get
             {
-                if (!IList_SCCL<T>.IsIndexLegal(this, beginIndex))
+                if (!this.IsIndexLegal(beginIndex))
                 {
                     throw new IndexOutOfRangeException($"Param beginIndex: {beginIndex} out of range. Item Count: {Count}.");
                 }
-                if (!IList_SCCL<T>.IsIndexLegal(this, endIndex))
+                if (!this.IsIndexLegal(endIndex))
                 {
                     throw new IndexOutOfRangeException($"Param endIndex: {endIndex} out of range. Item Count: {Count}.");
                 }
@@ -168,14 +167,12 @@ namespace SarachanCollectionClassLibrary
                 return result_ArrayList.ItemArray;
             }
         }
-
-        T ICollection_SCCL<T>.this[int index] => this[index];
         #endregion
 
         #region Operator
-        public static ArrayList_SCCL<T> operator +(ArrayList_SCCL<T> arr, IEnumerable<T> collection)
+        public static ArrayList_SCCL<T> operator +(ArrayList_SCCL<T> list, IEnumerable<T> collection)
         {
-            var result = (ArrayList_SCCL<T>)arr.MemberwiseClone();
+            var result = (ArrayList_SCCL<T>)list?.MemberwiseClone() ?? new ArrayList_SCCL<T>();
             result.Add(collection);
 
             return result;
@@ -192,6 +189,7 @@ namespace SarachanCollectionClassLibrary
 
         public void Add(IEnumerable<T> collection)
         {
+            collection ??= Array.Empty<T>();
             foreach (var item in collection)
             {
                 Add(item);
@@ -208,6 +206,8 @@ namespace SarachanCollectionClassLibrary
         {
             return IndexOf(item, enableReferenceEquals) != -1;
         }
+
+        public bool IsEmpty() => Count == 0;
 
         public int IndexOf(T item, bool enableReferenceEquals = false)
         {
@@ -236,7 +236,7 @@ namespace SarachanCollectionClassLibrary
 
         public void Insert(T item, int index)
         {
-            if (!IList_SCCL<T>.IsIndexLegal(this, index, 1))
+            if (!this.IsIndexLegal(index, 1))
             {
                 throw new IndexOutOfRangeException($"Index: {index} out of range. Item Count: {Count}.");
             }
@@ -254,7 +254,7 @@ namespace SarachanCollectionClassLibrary
 
         public void Insert(IEnumerable<T> collection, int index)
         {
-            if (!IList_SCCL<T>.IsIndexLegal(this, index, 1))
+            if (!this.IsIndexLegal(index, 1))
             {
                 throw new IndexOutOfRangeException($"Index: {index} out of range. Item Count: {Count}.");
             }
@@ -298,7 +298,7 @@ namespace SarachanCollectionClassLibrary
 
         public void RemoveAt(int index)
         {
-            if (!IList_SCCL<T>.IsIndexLegal(this, index))
+            if (!this.IsIndexLegal(index))
             {
                 throw new IndexOutOfRangeException($"Index: {index} out of range. Item Count: {Count}.");
             }
@@ -309,6 +309,41 @@ namespace SarachanCollectionClassLibrary
             }
 
             Count--;
+        }
+
+        public void PushFront(T item) => Insert(item, 0);
+
+        public void PushBack(T item) => Add(item);
+
+        public T PopFront()
+        {
+            if (IsEmpty())
+            {
+                throw new InvalidOperationException("Pop() can't be called while Stack is empty.");
+            }
+
+            var result = this[0];
+            RemoveAt(0);
+            return result;
+        }
+
+        public T PopBack() =>
+            IsEmpty() ? throw new InvalidOperationException("Pop can't be called while Stack is empty.") : this[Count--];
+
+        public T PeekFront() =>
+            IsEmpty() ? throw new InvalidOperationException("Peek can't be called while Stack is empty.") : this[0];
+
+        public T PeekBack() =>
+            IsEmpty() ? throw new InvalidOperationException("Peek can't be called while Stack is empty.") : this[Count - 1];
+
+        /// <summary>
+        /// 根据当前的 Count 更改 Capacity
+        /// </summary>
+        /// <param name="hasRedudency">是否需要冗余空间。若为 true Capacity 将变为 Count 的 1.2 倍。</param>
+        public void Trim(bool hasRedudency = false)
+        {
+            int neededCapacity = hasRedudency ? (int)Math.Ceiling(1.2 * Count) : Count;
+            Capacity = neededCapacity;
         }
 
         public IEnumerator<T> GetEnumerator() => new Enumerator(this);

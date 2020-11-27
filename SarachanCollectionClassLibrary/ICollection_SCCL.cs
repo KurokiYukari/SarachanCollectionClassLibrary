@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace SarachanCollectionClassLibrary
+namespace Sarachan.Collections
 {
     /// <summary>
-    /// 所有 Collection 类都要实现的最基本接口，定义了 Collection 要实现的基本功能。
+    /// Collection 接口
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public interface ICollection_SCCL<T> : System.Collections.Generic.IEnumerable<T>
@@ -18,15 +18,6 @@ namespace SarachanCollectionClassLibrary
         /// Collection 中所有 items 组成的 Array
         /// </summary>
         T[] ItemArray { get; }
-        #endregion
-
-        #region Indexers
-        /// <summary>
-        /// 只读访问器，指向 Collection 中指定 index 的 item
-        /// </summary>
-        /// <param name="index">index</param>
-        /// <returns></returns>
-        T this[int index] { get; }
         #endregion
 
         #region Methods
@@ -58,6 +49,12 @@ namespace SarachanCollectionClassLibrary
         /// <param name="enableReferenceEquals">使用 <seealso cref="Object.ReferenceEquals(object?, object?)"/> 方法来确定 item 是否存在，默认为 false (使用运算符 == 判断)</param>
         /// <returns>Collection 中是否含有指定 item</returns>
         bool Contains(T item, bool enableReferenceEquals = false);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>Collection 是否为空 Collection</returns>
+        bool IsEmpty();
 
         /// <summary>
         /// 将 Collection 中的 item 全部移除
