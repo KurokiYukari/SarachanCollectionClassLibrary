@@ -62,4 +62,18 @@ namespace Sarachan.Collections
         void Clear();
         #endregion
     }
+
+    public static partial class Algorithm_SCCL
+    {
+        public static int Count<T>(this System.Collections.Generic.IEnumerable<T> collection)
+        {
+            int result = 0;
+            foreach (var _ in collection)
+            {
+                result++;
+            }
+
+            return result;
+        }
+    }
 }

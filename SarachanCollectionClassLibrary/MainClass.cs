@@ -7,11 +7,19 @@ namespace Sarachan
     {
         private static void Main()
         {
-            System.Collections.Generic.IEnumerable<int> list1 = new LinkedList_SCCL<int> { 3, 9, 2};
-            var list2 = new ArrayList_SCCL<int> { 111, 222 };
-            
+            var hashSet = new HashSet_SCCL<int>();
+            hashSet.Remove(1);
 
-            Console.WriteLine(list2 + list1);
+            hashSet.Add(1);
+            hashSet.Add(1);
+            hashSet.Remove(1);
+
+            for (int i = 0; i < 100; i++)
+            {
+                hashSet.Add(i*4);
+            }
+
+            Console.WriteLine(hashSet);
         }
     }
 }
