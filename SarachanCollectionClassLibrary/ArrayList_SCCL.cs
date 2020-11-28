@@ -350,7 +350,7 @@ namespace Sarachan.Collections
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public override string ToString() => "[ " + string.Join(", ", this) + " ]";
+        public override string ToString() => $"[ {string.Join(", ", this)} ]";
 
         /// <summary>
         /// 检测在增加 increment 数目个 item 后当前 Capacity 是否足够使用。若否，会进行扩容

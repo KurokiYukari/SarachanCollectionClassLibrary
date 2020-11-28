@@ -1,12 +1,10 @@
-﻿using System;
-
-namespace Sarachan.Collections
+﻿namespace Sarachan.Collections
 {
     /// <summary>
     /// ISet 接口
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    interface ISet_SCCL<T> : ICollection_SCCL<T>
+    public interface ISet_SCCL<T> : ICollection_SCCL<T>
     {
         /// <summary>
         /// 只读属性，ISet 内部比较方式是否使用 <see cref="object.ReferenceEquals(object?, object?)"/>
@@ -29,7 +27,7 @@ namespace Sarachan.Collections
         new bool Remove(T item, bool enableReferenceEquals = false);
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="item"></param>
         /// <param name="enableReferenceEquals">无效参数</param>

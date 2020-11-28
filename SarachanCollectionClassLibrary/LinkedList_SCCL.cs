@@ -374,7 +374,7 @@ namespace Sarachan.Collections
 
         IEnumerator IEnumerable.GetEnumerator() => new Enumerator(this);
 
-        public override string ToString() => "[ " + string.Join(", ", this) + " ]";
+        public override string ToString() => $"[ {string.Join(", ", this)} ]";
 
         /// <summary>
         /// 应该在每次有增、删操作时调用，清除当前的 NodeList 缓存
