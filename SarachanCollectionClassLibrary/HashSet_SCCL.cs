@@ -70,6 +70,22 @@ namespace Sarachan.Collections
         }
         #endregion
 
+        #region Operator
+        public static HashSet_SCCL<T> operator +(HashSet_SCCL<T> lhp, IEnumerable<T> rhp)
+        {
+            var result = lhp.MemberwiseClone() as HashSet_SCCL<T>;
+            result.UnionWith(rhp);
+            return result;
+        }
+
+        public static HashSet_SCCL<T> operator -(HashSet_SCCL<T> lhp, IEnumerable<T> rhp)
+        {
+            var result = lhp.MemberwiseClone() as HashSet_SCCL<T>;
+            result.ExceptWith(rhp);
+            return result;
+        }
+        #endregion
+
         #region Methods
         public bool Add(T item)
         {
@@ -164,6 +180,89 @@ namespace Sarachan.Collections
         }
 
         public void UnionWith(IEnumerable<T> collection) => Add(collection);
+
+        public void SymmetricExceptWith(IEnumerable<T> collection)
+        {
+            UnionWith(collection);
+
+            var tempSet = MemberwiseClone() as ISet_SCCL<T>;
+            tempSet.IntersectWith(collection);
+
+            ExceptWith(tempSet);
+        }
+
+        public bool IsSubsetOf(IEnumerable<T> collection)
+        {
+            var colSet = collection as ICollection_SCCL<T>;
+            colSet ??= new HashSet_SCCL<T>(collection, EnableReferenceEquals);
+
+            foreach (var item in this)
+            {
+                /* 
+                 * Warning:
+                 * 下面的 Contains 会根据 collection 的类型决定比较方法，在 collection 原本就是 ISet_SCCL 时可能会造成比较迷惑的结果 qwq
+                 * （因为 ISet_SCCL 无视 enableReferenceEquals 参数，所以有可能会有 this 和 collection 比较方式不同的情况）
+                 */
+                if (!colSet.Contains(item, EnableReferenceEquals))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public bool IsSupersetOf(IEnumerable<T> collection)
+        {
+            foreach (var item in collection)
+            {
+                if (!Contains(item, EnableReferenceEquals))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public bool IsProperSupersetOf(IEnumerable<T> collection)
+        {
+            var colSet = collection as ISet_SCCL<T>;
+            colSet ??= new HashSet_SCCL<T>(collection);
+
+            if (Count == colSet.Count)
+            {
+                return false;
+            }
+
+            return IsSupersetOf(colSet);
+        }
+
+        public bool IsProperSubsetOf(IEnumerable<T> collection)
+        {
+            var colSet = collection as ISet_SCCL<T>;
+            colSet ??= new HashSet_SCCL<T>(collection);
+
+            if (Count == colSet.Count)
+            {
+                return false;
+            }
+
+            return IsSubsetOf(colSet);
+        }
+
+        public bool Overlaps(IEnumerable<T> collection)
+        {
+            foreach (var item in collection)
+            {
+                if (Contains(item))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         public IEnumerator<T> GetEnumerator() => new Enumerator(this);
 

@@ -1,4 +1,6 @@
-﻿namespace Sarachan.Collections
+﻿using System;
+
+namespace Sarachan.Collections
 {
     /// <summary>
     /// ISet 接口
@@ -10,6 +12,42 @@
         /// 只读属性，ISet 内部比较方式是否使用 <see cref="object.ReferenceEquals(object?, object?)"/>
         /// </summary>
         bool EnableReferenceEquals { get; init; }
+
+        public static ISet_SCCL<T> operator +(ISet_SCCL<T> lhp, System.Collections.Generic.IEnumerable<T> rhp)
+        {
+            ISet_SCCL<T> result;
+
+            // 采用反射机制调用默认构造函数构造构造
+            try
+            {
+                result = (ISet_SCCL<T>)Activator.CreateInstance(lhp?.GetType() ?? typeof(HashSet_SCCL<T>));
+            }
+            catch (Exception)
+            {
+                result = new HashSet_SCCL<T>();
+            }
+
+            result.UnionWith(rhp);
+            return result;
+        }
+
+        public static ISet_SCCL<T> operator -(ISet_SCCL<T> lhp, System.Collections.Generic.IEnumerable<T> rhp)
+        {
+            ISet_SCCL<T> result;
+
+            // 采用反射机制调用默认构造函数构造构造
+            try
+            {
+                result = (ISet_SCCL<T>)Activator.CreateInstance(lhp?.GetType() ?? typeof(HashSet_SCCL<T>));
+            }
+            catch (Exception)
+            {
+                result = new HashSet_SCCL<T>();
+            }
+
+            result.ExceptWith(rhp);
+            return result;
+        }
 
         /// <summary>
         /// 向 ISet 中添加元素
@@ -35,22 +73,63 @@
         new bool Contains(T item, bool enableReferenceEquals = false);
 
         /// <summary>
-        /// 将该 ISet 转化为自己和 collection 的并集
+        /// 执行 ISet = ISet ∪ collection
         /// </summary>
         /// <param name="collection"></param>
         void UnionWith(System.Collections.Generic.IEnumerable<T> collection);
 
         /// <summary>
-        /// 将该 ISet 转化为自己和 collection 的交集
+        /// 执行 ISet = ISet ∩ collection
         /// </summary>
         /// <param name="collection"></param>
         void IntersectWith(System.Collections.Generic.IEnumerable<T> collection);
 
         /// <summary>
-        /// 将该 ISet 转化为自己和 collection 的差集
+        /// 执行 ISet = ISet - collection
         /// </summary>
         /// <param name="collection"></param>
         void ExceptWith(System.Collections.Generic.IEnumerable<T> collection);
+
+        /// <summary>
+        /// 执行 ISet = (ISet ∪ collection) - (ISet ∩ collection)
+        /// </summary>
+        /// <param name="collection"></param>
+        void SymmetricExceptWith(System.Collections.Generic.IEnumerable<T> collection);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <returns>ISet 是否是 collection 的子集</returns>
+        bool IsSubsetOf(System.Collections.Generic.IEnumerable<T> collection);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <returns>ISet 是否是 collection 的超集</returns>
+        bool IsSupersetOf(System.Collections.Generic.IEnumerable<T> collection);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <returns>ISet 是否是 collection 的真子集</returns>
+        bool IsProperSupersetOf(System.Collections.Generic.IEnumerable<T> collection);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <returns>ISet 是否是 collection 的真超集</returns>
+        bool IsProperSubsetOf(System.Collections.Generic.IEnumerable<T> collection);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <returns>ISet ∩ collection 是否为空集</returns>
+        bool Overlaps(System.Collections.Generic.IEnumerable<T> collection);
 
         string ToString();
     }
