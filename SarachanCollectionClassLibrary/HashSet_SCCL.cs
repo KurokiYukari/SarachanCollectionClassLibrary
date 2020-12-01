@@ -18,12 +18,6 @@ namespace Sarachan.Collections
         /// 哈希表（ArrayList），采用拉链法（LinkedList）解决哈希冲突
         /// </summary>
         private readonly ArrayList_SCCL<LinkedList_SCCL<T>> _hashList;
-
-        /// <summary>
-        /// _hashList 的容量，其大小一定为 8 * 2^n （n为自然数）
-        /// </summary>
-        public int HashListCapacity => _hashList.Capacity;
-        public int Count { get; protected set; }
         #endregion
 
         #region Properties
@@ -40,18 +34,31 @@ namespace Sarachan.Collections
                 return result.ItemArray;
             }
         }
+        
 
-        public bool EnableReferenceEquals { get; init; }
+        /// <summary>
+        /// _hashList 的容量，其大小一定为 8 * 2^n （n为自然数）
+        /// </summary>
+        public int HashListCapacity => _hashList.Capacity;
+
+        public int Count { get; protected set; }
+
+        public IEqualityComparer<T> EqualityComparer { get; init; }
         #endregion
 
         #region Constructors
         /// <summary>
-        /// 默认构造函数，构造一个 Capacity 为 8 的空 HashSet
+        /// 默认构造函数，构造空 HashSet
         /// </summary>
-        /// <param name="enableReferenceEquals">是否使用 <see cref="object.ReferenceEquals(object?, object?)"/> 进行比较</param>
-        public HashSet_SCCL(bool enableReferenceEquals = false)
+        public HashSet_SCCL() : this(null) { }
+
+        /// <summary>
+        /// 构造一个比较器为 comparer 的空 HashSet
+        /// </summary>
+        /// <param name="comparer">比较器，默认使用<see cref="object.Equals(object?, object?)"/>进行比较</param>
+        public HashSet_SCCL(IEqualityComparer<T> comparer)
         {
-            EnableReferenceEquals = enableReferenceEquals;
+            EqualityComparer = comparer ?? EqualityComparer<T>.Default;
 
             _hashList = new ArrayList_SCCL<LinkedList_SCCL<T>>(_DEFAULT_HASHLIST_CAPACITY)
             {
@@ -63,8 +70,8 @@ namespace Sarachan.Collections
         /// 构造一个空 HashSet，然后把 collection 中所有元素添加到 HashSet 中
         /// </summary>
         /// <param name="collection"></param>
-        /// <param name="enableReferenceEquals">是否使用 <see cref="object.ReferenceEquals(object?, object?)"/> 进行比较</param>
-        public HashSet_SCCL(IEnumerable<T> collection, bool enableReferenceEquals = false) : this(enableReferenceEquals)
+        /// <param name="comparer">比较器，默认使用<see cref="object.Equals(object?, object?)"/>进行比较</param>
+        public HashSet_SCCL(IEnumerable<T> collection, IEqualityComparer<T> comparer = null) : this(comparer)
         {
             Add(collection);
         }
@@ -93,7 +100,7 @@ namespace Sarachan.Collections
 
             var linkedList = (_hashList[Hash(item)] ??= new LinkedList_SCCL<T>());
 
-            if (linkedList.Contains(item, EnableReferenceEquals))
+            if (linkedList.Contains(item, EqualityComparer))
             {
                 return false;
             }
@@ -115,11 +122,11 @@ namespace Sarachan.Collections
 
         void ICollection_SCCL<T>.Add(T item) => Add(item);
 
-        public bool Remove(T item, bool enableReferenceEquals = false)
+        public bool Remove(T item, IEqualityComparer<T> comparer = null)
         {
             var linkedlist = _hashList[Hash(item)];
 
-            if (!linkedlist?.Contains(item, EnableReferenceEquals) ?? true)
+            if (!linkedlist?.Contains(item, EqualityComparer) ?? true)
             {
                 return false;
             }
@@ -145,11 +152,11 @@ namespace Sarachan.Collections
             Count = 0;
         }
 
-        public bool Contains(T item, bool enableReferenceEquals = false)
+        public bool Contains(T item, IEqualityComparer<T> comparer = null)
         {
             var linkedList = _hashList[Hash(item)];
 
-            if (linkedList?.Contains(item, EnableReferenceEquals) ?? false)
+            if (linkedList?.Contains(item, EqualityComparer) ?? false)
             {
                 return true;
             }
@@ -163,7 +170,7 @@ namespace Sarachan.Collections
         {
             foreach (var item in collection)
             {
-                Remove(item, EnableReferenceEquals);
+                Remove(item);
             }
         }
 
@@ -172,9 +179,9 @@ namespace Sarachan.Collections
             var list = new ArrayList_SCCL<T>(collection);
             foreach (var item in this)
             {
-                if (!list.Contains(item, EnableReferenceEquals))
+                if (!list.Contains(item, EqualityComparer))
                 {
-                    Remove(item, EnableReferenceEquals);
+                    Remove(item, EqualityComparer);
                 }
             }
         }
@@ -194,7 +201,7 @@ namespace Sarachan.Collections
         public bool IsSubsetOf(IEnumerable<T> collection)
         {
             var colSet = collection as ICollection_SCCL<T>;
-            colSet ??= new HashSet_SCCL<T>(collection, EnableReferenceEquals);
+            colSet ??= new HashSet_SCCL<T>(collection, EqualityComparer);
 
             foreach (var item in this)
             {
@@ -203,7 +210,7 @@ namespace Sarachan.Collections
                  * 下面的 Contains 会根据 collection 的类型决定比较方法，在 collection 原本就是 ISet_SCCL 时可能会造成比较迷惑的结果 qwq
                  * （因为 ISet_SCCL 无视 enableReferenceEquals 参数，所以有可能会有 this 和 collection 比较方式不同的情况）
                  */
-                if (!colSet.Contains(item, EnableReferenceEquals))
+                if (!colSet.Contains(item, EqualityComparer))
                 {
                     return false;
                 }
@@ -216,7 +223,7 @@ namespace Sarachan.Collections
         {
             foreach (var item in collection)
             {
-                if (!Contains(item, EnableReferenceEquals))
+                if (!Contains(item, EqualityComparer))
                 {
                     return false;
                 }

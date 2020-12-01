@@ -196,16 +196,16 @@ namespace Sarachan.Collections
             ClearNodeCache();
         }
 
-        public bool Contains(T item, bool enableReferenceEquals = false)
+        public bool Contains(T item, IEqualityComparer<T> comparer = null)
         {
-            return IndexOf(item, enableReferenceEquals) != -1;
+            return IndexOf(item, comparer) != -1;
         }
 
         public IEnumerator<T> GetEnumerator() => new Enumerator(this);
 
         public bool IsEmpty() => Count == 0;
 
-        public int IndexOf(T item, bool enableReferenceEquals = false)
+        public int IndexOf(T item, IEqualityComparer<T> comparer = null)
         {
             var node = _headNode;
             for (int i = 0; i < Count; i++)
@@ -213,19 +213,9 @@ namespace Sarachan.Collections
                 node = node.NextNode;
                 var element = node.Val;
 
-                if (enableReferenceEquals)
+                if (comparer.Equals(item, element))
                 {
-                    if (ReferenceEquals(element, item))
-                    {
-                        return i;
-                    }
-                }
-                else
-                {
-                    if (Equals(element, item))
-                    {
-                        return i;
-                    }
+                    return i;
                 }
             }
 
@@ -292,9 +282,9 @@ namespace Sarachan.Collections
             ClearNodeCache();
         }
 
-        public bool Remove(T item, bool enableReferenceEquals = false)
+        public bool Remove(T item, IEqualityComparer<T> comparer = null)
         {
-            int index = IndexOf(item, enableReferenceEquals);
+            int index = IndexOf(item, comparer);
 
             if (index == -1)
             {

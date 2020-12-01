@@ -9,9 +9,9 @@ namespace Sarachan.Collections
     public interface ISet_SCCL<T> : ICollection_SCCL<T>
     {
         /// <summary>
-        /// 只读属性，ISet 内部比较方式是否使用 <see cref="object.ReferenceEquals(object?, object?)"/>
+        /// 只读属性，决定 ISet 内部的元素间比较方法的比较器
         /// </summary>
-        bool EnableReferenceEquals { get; init; }
+        System.Collections.Generic.IEqualityComparer<T> EqualityComparer { get; init; }
 
         public static ISet_SCCL<T> operator +(ISet_SCCL<T> lhp, System.Collections.Generic.IEnumerable<T> rhp)
         {
@@ -60,17 +60,17 @@ namespace Sarachan.Collections
         /// 删除 item
         /// </summary>
         /// <param name="item"></param>
-        /// <param name="enableReferenceEquals">无效参数</param>
+        /// <param name="comparer">无效参数注意 qwq</param>
         /// <returns>如果 ISet 中存在 item 则返回 true，否则返回 false</returns>
-        new bool Remove(T item, bool enableReferenceEquals = false);
+        new bool Remove(T item, System.Collections.Generic.IEqualityComparer<T> comparer = null);
 
         /// <summary>
         ///
         /// </summary>
         /// <param name="item"></param>
-        /// <param name="enableReferenceEquals">无效参数</param>
+        /// <param name="comparer">无效参数注意 qwq</param>
         /// <returns>如果 ISet 中存在 item 则返回 true，否则返回 false</returns>
-        new bool Contains(T item, bool enableReferenceEquals = false);
+        new bool Contains(T item, System.Collections.Generic.IEqualityComparer<T> comparer = null);
 
         /// <summary>
         /// 执行 ISet = ISet ∪ collection

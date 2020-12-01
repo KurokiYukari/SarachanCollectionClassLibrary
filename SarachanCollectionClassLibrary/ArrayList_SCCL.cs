@@ -202,32 +202,22 @@ namespace Sarachan.Collections
             Count = 0;
         }
 
-        public bool Contains(T item, bool enableReferenceEquals = false)
+        public bool Contains(T item, IEqualityComparer<T> comparer = null)
         {
-            return IndexOf(item, enableReferenceEquals) != -1;
+            return IndexOf(item, comparer) != -1;
         }
 
         public bool IsEmpty() => Count == 0;
 
-        public int IndexOf(T item, bool enableReferenceEquals = false)
+        public int IndexOf(T item, IEqualityComparer<T> comparer = null)
         {
             for (int i = 0; i < Count; i++)
             {
                 var element = this[i];
 
-                if (enableReferenceEquals)
+                if (comparer.Equals(item, element))
                 {
-                    if (ReferenceEquals(element, item))
-                    {
-                        return i;
-                    }
-                }
-                else
-                {
-                    if (Equals(element, item))
-                    {
-                        return i;
-                    }
+                    return i;
                 }
             }
 
@@ -283,9 +273,9 @@ namespace Sarachan.Collections
             Count += itemList.Count;
         }
 
-        public bool Remove(T item, bool enableReferenceEquals = false)
+        public bool Remove(T item, IEqualityComparer<T> comparer = null)
         {
-            int itemIndex = IndexOf(item, enableReferenceEquals);
+            int itemIndex = IndexOf(item, comparer);
             if (itemIndex < 0)
             {
                 return false;

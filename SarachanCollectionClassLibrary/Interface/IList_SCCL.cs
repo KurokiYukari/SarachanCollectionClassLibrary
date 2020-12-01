@@ -57,9 +57,9 @@ namespace Sarachan.Collections
         /// 
         /// </summary>
         /// <param name="item"></param>
-        /// <param name="enableReferenceEquals">使用 <seealso cref="Object.ReferenceEquals(object?, object?)"/> 方法来确定 item 是否删除，默认为 false (使用运算符 == 判断)</param>
+        /// <param name="comparer">比较器，默认使用<see cref="object.Equals(object?, object?)"/>进行比较</param>
         /// <returns>指定 item 的 index，如果不存在则返回 -1</returns>
-        int IndexOf(T item, bool enableReferenceEquals = false);
+        int IndexOf(T item, System.Collections.Generic.IEqualityComparer<T> comparer = null);
 
         /// <summary>
         /// 在指定 index 处插入指定 item
