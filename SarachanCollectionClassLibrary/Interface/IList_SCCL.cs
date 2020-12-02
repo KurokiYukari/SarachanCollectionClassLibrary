@@ -123,7 +123,7 @@ namespace Sarachan.Collections
         /// <param name="endIndex"></param>
         /// <param name="comparer">比较器</param>
         /// <param name="reverse">是否是逆序</param>
-        public static void Sort<T>(IList_SCCL<T> list, int beginIndex, int endIndex, System.Collections.Generic.IComparer<T> comparer = null, bool reverse = false)
+        public static void Sort<T>(this IList_SCCL<T> list, int beginIndex, int endIndex, System.Collections.Generic.IComparer<T> comparer = null, bool reverse = false)
         {
             if (beginIndex >= endIndex)
             {

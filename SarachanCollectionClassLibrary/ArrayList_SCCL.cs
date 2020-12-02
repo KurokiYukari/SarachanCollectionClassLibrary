@@ -338,8 +338,6 @@ namespace Sarachan.Collections
 
         public IEnumerator<T> GetEnumerator() => new Enumerator(this);
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
         public override string ToString() => $"[ {string.Join(", ", this)} ]";
 
         /// <summary>

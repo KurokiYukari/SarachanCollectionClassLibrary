@@ -8,11 +8,20 @@ namespace Sarachan.Collections
     /// <typeparam name="T"></typeparam>
     public interface ISet_SCCL<T> : ICollection_SCCL<T>
     {
+        #region Properties
         /// <summary>
         /// 只读属性，决定 ISet 内部的元素间比较方法的比较器
         /// </summary>
         System.Collections.Generic.IEqualityComparer<T> EqualityComparer { get; init; }
+        #endregion
 
+        #region Operator
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lhp"></param>
+        /// <param name="rhp"></param>
+        /// <returns>lhp ∪ rhp</returns>
         public static ISet_SCCL<T> operator +(ISet_SCCL<T> lhp, System.Collections.Generic.IEnumerable<T> rhp)
         {
             ISet_SCCL<T> result;
@@ -31,6 +40,12 @@ namespace Sarachan.Collections
             return result;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lhp"></param>
+        /// <param name="rhp"></param>
+        /// <returns>lhp - rhp</returns>
         public static ISet_SCCL<T> operator -(ISet_SCCL<T> lhp, System.Collections.Generic.IEnumerable<T> rhp)
         {
             ISet_SCCL<T> result;
@@ -48,7 +63,9 @@ namespace Sarachan.Collections
             result.ExceptWith(rhp);
             return result;
         }
+        #endregion
 
+        #region Methods
         /// <summary>
         /// 向 ISet 中添加元素
         /// </summary>
@@ -60,9 +77,8 @@ namespace Sarachan.Collections
         /// 删除 item
         /// </summary>
         /// <param name="item"></param>
-        /// <param name="comparer">无效参数注意 qwq</param>
         /// <returns>如果 ISet 中存在 item 则返回 true，否则返回 false</returns>
-        new bool Remove(T item, System.Collections.Generic.IEqualityComparer<T> comparer = null);
+        bool Remove(T item);
 
         /// <summary>
         ///
@@ -70,7 +86,7 @@ namespace Sarachan.Collections
         /// <param name="item"></param>
         /// <param name="comparer">无效参数注意 qwq</param>
         /// <returns>如果 ISet 中存在 item 则返回 true，否则返回 false</returns>
-        new bool Contains(T item, System.Collections.Generic.IEqualityComparer<T> comparer = null);
+        bool Contains(T item);  
 
         /// <summary>
         /// 执行 ISet = ISet ∪ collection
@@ -132,5 +148,12 @@ namespace Sarachan.Collections
         bool Overlaps(System.Collections.Generic.IEnumerable<T> collection);
 
         string ToString();
+        #endregion
+
+        #region Explicit Implementions of ICollection_SCCL
+        void ICollection_SCCL<T>.Add(T item) => Add(item);
+        bool ICollection_SCCL<T>.Remove(T item, System.Collections.Generic.IEqualityComparer<T> comparer) => Remove(item);
+        bool ICollection_SCCL<T>.Contains(T item, System.Collections.Generic.IEqualityComparer<T> comparer) => Contains(item);
+        #endregion
     }
 }

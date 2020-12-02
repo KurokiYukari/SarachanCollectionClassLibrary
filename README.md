@@ -1,6 +1,9 @@
 # SarachanCollectionClassLibrary
 一个实现了各种数据结构的 C# 类库。  
-为了能够使用 foreach 进行遍历，所有容器类都依赖于 System.Collections.Generic.IEnumerable<>。  
+因为本来就是在造轮子，所以本库尽可能少地使用 BCL 中的各种已有的实现。以下是使用到的 BCL 中的接口：  
++ System.Collections.Generic.IEnumerable<T>：支持 foreach 和 LINQ。
++ System.Collections.Generic.IComparer<T>：支持自定义比较（多用于排序）。
++ System.Collections.Generic.IEqualityComparer<T>：支持自定义相等比较（用于 Set 等需要相等比较的地方）。
   
 本库的接口可以理解为一种访问器，表示以该接口的方法访问容器，比如：
 ``` C#

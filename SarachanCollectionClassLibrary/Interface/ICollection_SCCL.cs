@@ -60,6 +60,10 @@ namespace Sarachan.Collections
         /// </summary>
         void Clear();
         #endregion
+
+        #region Explicit Implementions of IEnumerable
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+        #endregion
     }
 
     public static partial class Algorithm_SCCL
