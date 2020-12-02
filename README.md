@@ -16,9 +16,11 @@ ICollection_SCCL<> : 所有容器类都要实现的接口，除非特别生命�
 IList_SCCL<> : List 接口  
 IQueue_SCCL<> : Queue 接口  
 IStack_SCCL<> : Stack 接口  
-ISet_SCCL<> : Set 接口  
+ISet_SCCL<> : Set 接口
+IMap_SCCL<> : Map 接口  
 
 ## 目前实现的所有容器类
 ArrayList_SCCL<> : 可变长数组。实现了 IList_SCCL, IQueue_SCCL, IStack_SCCL  
 LinkedList_SCCL<> : 链表。实现了 IList_SCCL, IQueue_SCCL, IStack_SCCL  
 HashSet<> : 哈希集合。实现了 ISet_SCCL  
+HashMap_SCCL<> : 哈希Map。实现了 IMap_SCCL  
