@@ -14,7 +14,7 @@ namespace Sarachan.Collections
         #endregion
 
         #region Properties
-        public T[] ItemArray
+        public T[] Items
         {
             get
             {

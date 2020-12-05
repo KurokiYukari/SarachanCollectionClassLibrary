@@ -28,7 +28,7 @@ namespace Sarachan.Collections
         /// </summary>
         public int HashListCapacity => _hashList.Capacity;
 
-        public KeyValuePair_SCCL<TKey, TValue>[] ItemArray
+        public KeyValuePair_SCCL<TKey, TValue>[] Items
         {
             get
             {

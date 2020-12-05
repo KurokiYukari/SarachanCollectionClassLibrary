@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <OutputType>Exe</OutputType>
-    <StartupObject>Sarachan.Program</StartupObject>
+    <OutputType>Library</OutputType>
+    <StartupObject></StartupObject>
     <RootNamespace>Sarachan.Collections</RootNamespace>
     <AssemblyName>Sarachan.Collections</AssemblyName>
   </PropertyGroup>

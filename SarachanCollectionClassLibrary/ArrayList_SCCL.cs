@@ -49,7 +49,7 @@ namespace Sarachan.Collections
 
         public int Count { get; protected set; }
 
-        public T[] ItemArray
+        public T[] Items
         {
             get
             {
@@ -164,7 +164,7 @@ namespace Sarachan.Collections
                     }
                 }
 
-                return result_ArrayList.ItemArray;
+                return result_ArrayList.Items;
             }
         }
         #endregion

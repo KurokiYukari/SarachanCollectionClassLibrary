@@ -17,7 +17,7 @@ namespace Sarachan.Collections
         /// <summary>
         /// Collection 中所有 items 组成的 Array
         /// </summary>
-        T[] ItemArray { get; }
+        T[] Items { get; }
         #endregion
 
         #region Methods
