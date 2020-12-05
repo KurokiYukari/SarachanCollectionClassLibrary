@@ -10,17 +10,22 @@
 // 代表以 Stack 的形式来访问 ArrayList
 IStack_SCCL<int> stack = new ArrayList_SCCL<int>();
 ```
+## Usage
+要求 .Net 5.0，C# 9.0。  
+可以直接 clone 源码使用，也可以下载 release 中的 dll 引入该程序集使用。  
+所有东西都在 namespace Sarachan.Collections 中，建议直接 using。  
 
 ## 接口
 ICollection_SCCL<> : 所有容器类都要实现的接口，除非特别生命，容器类都默认实现了该接口  
 IList_SCCL<> : List 接口  
 IQueue_SCCL<> : Queue 接口  
 IStack_SCCL<> : Stack 接口  
-ISet_SCCL<> : Set 接口
+ISet_SCCL<> : Set 接口  
 IMap_SCCL<> : Map 接口  
 
 ## 目前实现的所有容器类
 ArrayList_SCCL<> : 可变长数组。实现了 IList_SCCL, IQueue_SCCL, IStack_SCCL  
 LinkedList_SCCL<> : 链表。实现了 IList_SCCL, IQueue_SCCL, IStack_SCCL  
-HashSet<> : 哈希集合。实现了 ISet_SCCL  
+HashSet_SCCL<> : 哈希集合。实现了 ISet_SCCL  
 HashMap_SCCL<> : 哈希Map。实现了 IMap_SCCL  
+SortedList_SCCL<> : 基于红黑树的有序列表。实现了 IList_SCCL  
